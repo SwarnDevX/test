@@ -1,0 +1,7 @@
+.next/
+node_modules/
+*.db
+*.db-journal
+.env.local
+/public/uploads/
+.DS_Store

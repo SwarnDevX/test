@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npx prisma *)",
+      "Bash(node -e \"console.log\\(require\\('./node_modules/next/package.json'\\).version\\)\")",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/login)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/register)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/dashboard)",
+      "Bash(curl -s -X POST http://localhost:3000/api/auth/register -H \"Content-Type: application/json\" -d '{\"name\":\"Test User\",\"email\":\"test@test.com\",\"password\":\"password123\"}')",
+      "Bash(curl -s -X POST http://localhost:3000/api/auth/register -H \"Content-Type: application/json\" -d '{\"name\":\"Test User\",\"email\":\"test2@test.com\",\"password\":\"password123\"}')",
+      "Bash(curl -s -X POST http://localhost:3000/api/auth/register -H \"Content-Type: application/json\" -d '{\"name\":\"Test User\",\"email\":\"test3@test.com\",\"password\":\"password123\"}')",
+      "Bash(curl -s -w \"\\\\n%{http_code}\" http://localhost:3000/api/auth/login -X POST -H \"Content-Type: application/json\" -d '{\"email\":\"demo@adcreative.ai\",\"password\":\"demo1234\"}')",
+      "Bash(Get-Content \"C:\\\\Users\\\\2479792\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-2479792-Documents-Custom-Office-Templates-MyTar2\\\\eeef31ad-a6bd-45b8-9e28-ff19bc1594e7\\\\tasks\\\\bw8genask.output\")",
+      "Bash(node -e \"require\\('jose'\\); console.log\\('jose ok'\\)\")",
+      "Bash(npx next *)",
+      "Bash(node -e \"console.log\\('react:', require\\('c:/Users/2479792/Documents/Custom Office Templates/MyTar2/node_modules/react/package.json'\\).version\\)\")",
+      "Bash(node -e \"console.log\\('react-konva:', require\\('c:/Users/2479792/Documents/Custom Office Templates/MyTar2/node_modules/react-konva/package.json'\\).version\\)\")",
+      "Bash(node -e \"console.log\\('react-reconciler:', require\\('c:/Users/2479792/Documents/Custom Office Templates/MyTar2/node_modules/react-reconciler/package.json'\\).version\\)\")",
+      "Bash(node -e \"const pkg = require\\('c:/Users/2479792/Documents/Custom Office Templates/MyTar2/node_modules/react-konva/package.json'\\); console.log\\('peerDeps:', JSON.stringify\\(pkg.peerDependencies\\)\\); console.log\\('deps:', JSON.stringify\\(pkg.dependencies\\)\\)\")",
+      "Bash(node -e \"console.log\\('konva browser entry:', require.resolve\\('konva/lib/index'\\)\\)\")",
+      "Bash(node -e \"const R = require\\('c:/Users/2479792/Documents/Custom Office Templates/MyTar2/node_modules/react'\\); const internals = R.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED; console.log\\('internals keys:', Object.keys\\(internals\\)\\); console.log\\('ReactCurrentOwner:', internals.ReactCurrentOwner\\);\")",
+      "Bash(node -e \"const p = require\\('c:/Users/2479792/Documents/Custom Office Templates/MyTar2/node_modules/react/package.json'\\); console.log\\('exports:', JSON.stringify\\(p.exports, null, 2\\)\\); console.log\\('main:', p.main\\); console.log\\('module:', p.module\\);\")",
+      "Bash(node -e \"const p = require\\('c:/Users/2479792/Documents/Custom Office Templates/MyTar2/node_modules/react-konva/package.json'\\); console.log\\('main:', p.main\\); console.log\\('module:', p.module\\); console.log\\('exports:', JSON.stringify\\(p.exports, null, 2\\)\\)\")",
+      "Bash(node -e \"const p = require\\('c:/Users/2479792/Documents/Custom Office Templates/MyTar2/node_modules/its-fine/package.json'\\); console.log\\('main:', p.main\\); console.log\\('module:', p.module\\); console.log\\('exports:', JSON.stringify\\(p.exports, null, 2\\)\\)\")"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\2479792\\.claude\\projects\\c--Users-2479792-Documents-Custom-Office-Templates\\memory"
+    ]
+  }
+}

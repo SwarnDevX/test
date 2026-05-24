@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    /* ── Surfaces ─────────────────────────────────────────────────────── */
+    --bg-base: #07090d;
+    --bg-gradient-start: #0a0d14;
+    --bg-gradient-end: #0d111a;
+    --surface-1: rgba(255, 255, 255, 0.03);
+    --surface-2: rgba(255, 255, 255, 0.05);
+    --surface-3: rgba(255, 255, 255, 0.08);
+    --surface-elevated: rgba(20, 24, 36, 0.65);
+
+    /* ── Borders ──────────────────────────────────────────────────────── */
+    --border-subtle: rgba(255, 255, 255, 0.06);
+    --border-default: rgba(255, 255, 255, 0.1);
+    --border-strong: rgba(255, 255, 255, 0.16);
+
+    /* ── Text ─────────────────────────────────────────────────────────── */
+    --text-primary: #f5f7fa;
+    --text-secondary: #a8b0bd;
+    --text-tertiary: #6b7280;
+    --text-disabled: #4b5563;
+
+    /* ── Brand accent ─────────────────────────────────────────────────── */
+    --accent: #7c9eff;
+    --accent-hover: #93b0ff;
+    --accent-glow: rgba(124, 158, 255, 0.35);
+
+    /* ── Semantic ─────────────────────────────────────────────────────── */
+    --success: #34d399;
+    --warning: #fbbf24;
+    --danger: #f87171;
+    --critical: #ef4444;
+    --info: #60a5fa;
+
+    /* ── Risk score color ramp ────────────────────────────────────────── */
+    --risk-critical: #ef4444;
+    --risk-high: #f97316;
+    --risk-medium: #fbbf24;
+    --risk-safe: #34d399;
+
+    /* ── Shadows ──────────────────────────────────────────────────────── */
+    --shadow-glass:
+      0 1px 0 0 rgba(255, 255, 255, 0.04) inset,
+      0 0 0 1px var(--border-default),
+      0 20px 40px -20px rgba(0, 0, 0, 0.5),
+      0 8px 16px -8px rgba(0, 0, 0, 0.3);
+    --shadow-glow-accent: 0 0 32px -8px var(--accent-glow);
+    --shadow-glow-danger: 0 0 32px -8px rgba(248, 113, 113, 0.4);
+
+    /* ── Blur ─────────────────────────────────────────────────────────── */
+    --blur-glass: blur(20px) saturate(180%);
+    --blur-overlay: blur(40px) saturate(160%);
+
+    /* ── Radii ────────────────────────────────────────────────────────── */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--bg-base);
+    background-image:
+      radial-gradient(ellipse 80% 60% at 50% -20%, rgba(124, 158, 255, 0.15), transparent 60%),
+      radial-gradient(ellipse 60% 40% at 0% 50%, rgba(168, 85, 247, 0.08), transparent 60%),
+      linear-gradient(180deg, var(--bg-gradient-start), var(--bg-gradient-end));
+    background-attachment: fixed;
+    color: var(--text-primary);
+    min-height: 100vh;
+  }
+
+  /* Tabular numbers for metric displays */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+
+  /* Shimmer animation for skeleton loading */
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      var(--surface-1) 25%,
+      var(--surface-2) 50%,
+      var(--surface-1) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  /* Pulse glow for critical unread alerts */
+  @keyframes glow-pulse {
+    0%, 100% { box-shadow: var(--shadow-glow-danger); }
+    50% { box-shadow: 0 0 48px -8px rgba(248, 113, 113, 0.6); }
+  }
+
+  .glow-pulse {
+    animation: glow-pulse 2s ease-in-out infinite;
+  }
+
+  /* Smooth transitions — transform/opacity only per spec */
+  .transition-glass {
+    transition: background-color 200ms ease-out, opacity 200ms ease-out, transform 200ms ease-out;
+  }
+}

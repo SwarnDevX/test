@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --version)",
+      "Bash(npm list *)",
+      "Bash(corepack --version)",
+      "Read(//c/Users/2479792/AppData/Roaming/**)",
+      "Bash(pnpm --version)",
+      "PowerShell(Get-ChildItem \"$env:APPDATA\\\\npm\" -ErrorAction SilentlyContinue | Select-Object Name; $env:PATH -split \";\" | Select-Object -First 10)",
+      "PowerShell(npm root -g)",
+      "PowerShell(npm bin -g 2>&1)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\2479792\\\\AppData\\\\Roaming\\\\npm\" -Force | ForEach-Object { $_.FullName })"
+    ]
+  }
+}
