@@ -1,0 +1,31 @@
+package dev.codecrafter.health;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+
+import dev.codecrafter.config.SecurityConfig;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@WebMvcTest(HealthController.class)
+@Import(SecurityConfig.class)
+class HealthControllerTest {
+
+    @Autowired
+    MockMvc mockMvc;
+
+    @Test
+    void healthEndpointReturnsUp() throws Exception {
+        mockMvc.perform(get("/api/v1/health").accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.status").value("UP"))
+            .andExpect(jsonPath("$.version").value("0.1.0"))
+            .andExpect(jsonPath("$.timestamp").isNotEmpty());
+    }
+}

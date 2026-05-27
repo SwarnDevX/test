@@ -1,0 +1,65 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: codecrafter-judge-worker
+
+  threads:
+    virtual:
+      enabled: true
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/codecrafter}
+    username: ${SPRING_DATASOURCE_USERNAME:cc_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:cc_pass}
+    hikari:
+      maximum-pool-size: 5
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+  flyway:
+    enabled: false   # schema managed by backend; worker is read/write only
+
+  rabbitmq:
+    host: ${SPRING_RABBITMQ_HOST:localhost}
+    port: ${SPRING_RABBITMQ_PORT:5672}
+    username: ${SPRING_RABBITMQ_USERNAME:cc_rabbit}
+    password: ${SPRING_RABBITMQ_PASSWORD:cc_rabbit_pass}
+    listener:
+      simple:
+        prefetch: 1
+        acknowledge-mode: manual
+        concurrency: 2
+        max-concurrency: 4
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+judge:
+  docker:
+    host: ${JUDGE_DOCKER_HOST:unix:///var/run/docker.sock}
+    socket-timeout-seconds: 30
+  seccomp-profile: ${JUDGE_SECCOMP_PROFILE:/profiles/judge.json}
+  sandbox:
+    memory-limit-mb: 256
+    cpu-limit: 1.0
+    pids-limit: 64
+    tmpfs-size-mb: 64
+    wall-clock-timeout-seconds: 10
+    compile-timeout-seconds: 30
+    output-size-limit-bytes: 65536
+
+logging:
+  level:
+    dev.codecrafter.judge: INFO

@@ -1,0 +1,124 @@
+{
+  "defaultAction": "SCMP_ACT_ALLOW",
+  "architectures": ["SCMP_ARCH_X86_64", "SCMP_ARCH_X86", "SCMP_ARCH_X32"],
+  "syscalls": [
+    {
+      "comment": "Block all network socket creation",
+      "names": ["socket"],
+      "action": "SCMP_ACT_ERRNO",
+      "args": [
+        {
+          "index": 0,
+          "value": 2,
+          "op": "SCMP_CMP_EQ",
+          "comment": "AF_INET (IPv4)"
+        }
+      ]
+    },
+    {
+      "comment": "Block IPv6 socket creation",
+      "names": ["socket"],
+      "action": "SCMP_ACT_ERRNO",
+      "args": [
+        {
+          "index": 0,
+          "value": 10,
+          "op": "SCMP_CMP_EQ",
+          "comment": "AF_INET6"
+        }
+      ]
+    },
+    {
+      "comment": "Block Unix domain socket creation (prevent IPC with host)",
+      "names": ["socket"],
+      "action": "SCMP_ACT_ERRNO",
+      "args": [
+        {
+          "index": 0,
+          "value": 1,
+          "op": "SCMP_CMP_EQ",
+          "comment": "AF_UNIX"
+        }
+      ]
+    },
+    {
+      "comment": "Block raw socket creation",
+      "names": ["socket"],
+      "action": "SCMP_ACT_ERRNO",
+      "args": [
+        {
+          "index": 0,
+          "value": 16,
+          "op": "SCMP_CMP_EQ",
+          "comment": "AF_NETLINK"
+        }
+      ]
+    },
+    {
+      "comment": "Block filesystem mounts",
+      "names": ["mount", "umount", "umount2"],
+      "action": "SCMP_ACT_ERRNO"
+    },
+    {
+      "comment": "Block kernel module loading",
+      "names": ["init_module", "finit_module", "delete_module"],
+      "action": "SCMP_ACT_ERRNO"
+    },
+    {
+      "comment": "Block namespace manipulation",
+      "names": ["setns", "unshare"],
+      "action": "SCMP_ACT_ERRNO"
+    },
+    {
+      "comment": "Block ptrace (prevents process inspection)",
+      "names": ["ptrace"],
+      "action": "SCMP_ACT_ERRNO"
+    },
+    {
+      "comment": "Block clock manipulation",
+      "names": ["clock_settime", "clock_adjtime", "adjtimex", "settimeofday"],
+      "action": "SCMP_ACT_ERRNO"
+    },
+    {
+      "comment": "Block privilege escalation",
+      "names": ["setuid", "setgid", "setreuid", "setregid", "setresuid", "setresgid",
+                 "capset", "chown", "fchown", "lchown", "fchownat"],
+      "action": "SCMP_ACT_ERRNO"
+    },
+    {
+      "comment": "Block device creation",
+      "names": ["mknod", "mknodat"],
+      "action": "SCMP_ACT_ERRNO"
+    },
+    {
+      "comment": "Block pivot_root (container escape vector)",
+      "names": ["pivot_root"],
+      "action": "SCMP_ACT_ERRNO"
+    },
+    {
+      "comment": "Block key management (kernel keyring)",
+      "names": ["add_key", "request_key", "keyctl"],
+      "action": "SCMP_ACT_ERRNO"
+    },
+    {
+      "comment": "Block BPF (can be used to bypass restrictions)",
+      "names": ["bpf"],
+      "action": "SCMP_ACT_ERRNO"
+    },
+    {
+      "comment": "Block perf event access",
+      "names": ["perf_event_open"],
+      "action": "SCMP_ACT_ERRNO"
+    },
+    {
+      "comment": "Block reboot/kexec",
+      "names": ["reboot", "kexec_load", "kexec_file_load"],
+      "action": "SCMP_ACT_ERRNO"
+    },
+    {
+      "comment": "Block swapping",
+      "names": ["swapoff", "swapon"],
+      "action": "SCMP_ACT_ERRNO"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+# Local development overrides — hot reload, debug ports, source mounts.
+# This file is automatically merged by `docker compose up`.
+
+version: '3.9'
+
+services:
+  api:
+    build:
+      target: development
+    environment:
+      SPRING_DEVTOOLS_RESTART_ENABLED: "true"
+      SPRING_DEVTOOLS_LIVERELOAD_ENABLED: "true"
+    command:
+      - java
+      - -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+      - -jar
+      - app.jar
+
+  web:
+    build:
+      target: development
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+      - /app/.next
+    command: npm run dev
+    environment:
+      WATCHPACK_POLLING: "true"   # needed on Windows WSL2 for file watching
