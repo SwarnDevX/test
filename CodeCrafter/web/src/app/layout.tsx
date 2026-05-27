@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "sonner";
 import { QueryProvider } from "@/components/query-provider";
+import { NextAuthSessionProvider } from "@/components/session-provider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -39,10 +40,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning className={inter.variable}>
       <body className="min-h-screen font-sans">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          <QueryProvider>
-            {children}
-            <Toaster richColors position="bottom-right" />
-          </QueryProvider>
+          <NextAuthSessionProvider>
+            <QueryProvider>
+              {children}
+              <Toaster richColors position="bottom-right" />
+            </QueryProvider>
+          </NextAuthSessionProvider>
         </ThemeProvider>
       </body>
     </html>
