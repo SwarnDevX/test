@@ -1,0 +1,22 @@
+// Register all integration nodes
+import "./slack.js";
+import "./github.js";
+import "./sendgrid.js";
+import "./stripe.js";
+import "./hubspot.js";
+import "./notion.js";
+import "./airtable.js";
+import "./google-sheets.js";
+import "./discord.js";
+import "./twilio.js";
+import "./mailchimp.js";
+import "./salesforce.js";
+import "./jira.js";
+import "./linear.js";
+import "./shopify.js";
+import "./postgres.js";
+import "./mysql.js";
+import "./mongodb.js";
+import "./redis.js";
+import "./s3.js";
+import "./openai-assistant.js";

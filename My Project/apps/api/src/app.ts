@@ -1,59 +1,90 @@
-import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import compression from 'compression';
-import dotenv from 'dotenv';
-dotenv.config();
+import type { FastifyInstance } from "fastify";
+import cors from "@fastify/cors";
+import helmet from "@fastify/helmet";
+import cookie from "@fastify/cookie";
+import multipart from "@fastify/multipart";
+import rateLimit from "@fastify/rate-limit";
+import swagger from "@fastify/swagger";
+import swaggerUi from "@fastify/swagger-ui";
+import { fastifyTRPCPlugin, type FastifyTRPCPluginOptions } from "@trpc/server/adapters/fastify";
 
-import generationRouter from './modules/generation/generation.router';
-import analyticsRouter from './modules/analytics/analytics.router';
-import authRouter from './modules/auth/auth.router';
-import { errorHandler } from './middleware/errorHandler';
-import redis from './config/redis';
-import db from './config/db';
+import { createContext } from "./context.js";
+import { webhookRouter } from "./routes/webhook.js";
+import { appRouter, type AppRouter } from "./routers/index.js";
+import { redisClient } from "./services/redis.js";
 
-const app = express();
-const PORT = process.env.PORT || 4000;
+export async function buildApp(fastify: FastifyInstance) {
+  // Security
+  await fastify.register(helmet, {
+    contentSecurityPolicy: false, // handled by Next.js
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  });
 
-// Security & utility middleware
-app.use(helmet());
-app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:5173', credentials: true }));
-app.use(compression());
-app.use(express.json({ limit: '1mb' }));
+  await fastify.register(cors, {
+    origin: process.env["NEXTAUTH_URL"] ?? "http://localhost:3000",
+    credentials: true,
+  });
 
-// Health check
-app.get('/health', async (_req, res) => {
-  const [dbOk, redisOk] = await Promise.all([
-    db.raw('SELECT 1').then(() => true).catch(() => false),
-    redis.ping().then(() => true).catch(() => false),
-  ]);
-  res.json({ status: 'ok', db: dbOk, redis: redisOk, uptime: process.uptime() });
-});
+  await fastify.register(cookie, {
+    secret: process.env["AUTH_SECRET"] ?? "change-me",
+  });
 
-// Routes
-app.use('/api/generate', generationRouter);
-app.use('/api/analytics', analyticsRouter);
-app.use('/api/auth', authRouter);
+  await fastify.register(rateLimit, {
+    redis: redisClient,
+    max: 100,
+    timeWindow: "1 minute",
+    keyGenerator: (request) => {
+      return (request.headers["x-workspace-id"] as string) ?? request.ip;
+    },
+  });
 
-// Global error handler
-app.use(errorHandler);
+  await fastify.register(multipart, {
+    limits: { fileSize: 100 * 1024 * 1024 }, // 100MB
+  });
 
-async function start() {
-  try {
-    await redis.connect();
-    console.log('✅ Redis connected');
-    await db.raw('SELECT 1');
-    console.log('✅ PostgreSQL connected');
-    app.listen(PORT, () => {
-      console.log(`🚀 API running at http://localhost:${PORT}`);
-    });
-  } catch (err) {
-    console.error('Failed to start server:', err);
-    process.exit(1);
-  }
+  // OpenAPI docs
+  await fastify.register(swagger, {
+    openapi: {
+      info: { title: "FlowForge API", version: "0.1.0", description: "FlowForge public REST API" },
+      servers: [{ url: process.env["API_URL"] ?? "http://localhost:3001" }],
+      components: {
+        securitySchemes: {
+          bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "JWT" },
+          apiKey: { type: "apiKey", in: "header", name: "X-Api-Key" },
+        },
+      },
+    },
+  });
+
+  await fastify.register(swaggerUi, {
+    routePrefix: "/docs",
+    uiConfig: { docExpansion: "list", deepLinking: false },
+  });
+
+  // tRPC
+  await fastify.register(fastifyTRPCPlugin, {
+    prefix: "/trpc",
+    useWSS: false,
+    trpcOptions: {
+      router: appRouter,
+      createContext,
+      onError: ({ path, error }) => {
+        if (error.code === "INTERNAL_SERVER_ERROR") {
+          fastify.log.error(`tRPC error on ${path}: ${error.message}`);
+        }
+      },
+    } satisfies FastifyTRPCPluginOptions<AppRouter>["trpcOptions"],
+  });
+
+  // Public webhook gateway (bypass auth)
+  await fastify.register(webhookRouter, { prefix: "/webhooks" });
+
+  // Health check
+  fastify.get("/health", async () => ({
+    status: "ok",
+    version: "0.1.0",
+    timestamp: new Date().toISOString(),
+  }));
+
+  return fastify;
 }
-
-start();
-
-export default app;
-

@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+.next/
+out/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Test outputs
+coverage/
+playwright-report/
+test-results/
+
+# Turbo
+.turbo/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# Foundry
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+broadcast/
+
+# Logs
+*.log
+logs/
+
+# TypeScript
+*.tsbuildinfo

@@ -1,0 +1,30 @@
+{
+  "name": "@flowforge/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --clear-screen=false src/index.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/index.js",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@flowforge/db": "workspace:*",
+    "@flowforge/nodes-sdk": "workspace:*",
+    "@flowforge/shared": "workspace:*",
+    "bullmq": "^5.12.12",
+    "ioredis": "^5.4.1",
+    "pyodide": "^0.26.2",
+    "socket.io-client": "^4.7.5",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.1.0",
+    "tsx": "^4.17.0",
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.5"
+  }
+}

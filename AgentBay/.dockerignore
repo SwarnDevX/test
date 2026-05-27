@@ -1,0 +1,46 @@
+# Version control
+.git
+.gitignore
+
+# Dependency directories — reinstalled in Docker
+node_modules
+**/node_modules
+
+# Build outputs — rebuilt in Docker
+dist
+**/.next
+**/out
+contracts/out
+contracts/cache
+
+# Foundry
+contracts/lib
+
+# Local dev files
+.env
+**/.env
+.env.*
+!.env.example
+
+# Tests & coverage
+coverage
+**/coverage
+
+# Logs
+*.log
+logs/
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode
+.idea
+*.swp
+
+# Turbo cache
+.turbo
+
+# CI artifacts
+*.tsbuildinfo

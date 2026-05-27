@@ -1,0 +1,88 @@
+/* FlowForge Design System — OKLCH Color Tokens */
+/* Aesthetic: Linear × Vercel × Arc × Raycast */
+
+:root,
+[data-theme="dark"] {
+  /* ─── Background ─────────────────────────────────────────────────────────── */
+  --bg-base:      9% 0.010 260;     /* oklch(9% 0.010 260)   — canvas deep dark */
+  --bg-surface-1: 12% 0.012 260;   /* oklch(12% 0.012 260)  — card base */
+  --bg-surface-2: 15% 0.015 260;   /* oklch(15% 0.015 260)  — elevated card */
+  --bg-surface-3: 18% 0.018 260;   /* oklch(18% 0.018 260)  — tooltip / popover */
+  --bg-surface-4: 22% 0.020 260;   /* oklch(22% 0.020 260)  — modal / dialog */
+  --bg-surface-5: 26% 0.022 260;   /* oklch(26% 0.022 260)  — drawer */
+  --bg-surface-6: 30% 0.024 260;   /* oklch(30% 0.024 260)  — topmost overlay */
+
+  /* ─── Borders ────────────────────────────────────────────────────────────── */
+  --border:       22% 0.020 260;   /* with alpha */
+  --border-focus: 65% 0.180 240;   /* accent color when focused */
+
+  /* ─── Foreground ─────────────────────────────────────────────────────────── */
+  --fg:           96% 0.005 260;   /* oklch(96% 0.005 260)  — primary text */
+  --fg-muted:     55% 0.012 260;   /* oklch(55% 0.012 260)  — secondary text */
+  --fg-subtle:    40% 0.010 260;   /* oklch(40% 0.010 260)  — tertiary text */
+  --fg-disabled:  30% 0.008 260;   /* oklch(30% 0.008 260)  — disabled */
+
+  /* ─── Accent (Electric Blue) ─────────────────────────────────────────────── */
+  --accent:       65% 0.180 240;   /* oklch(65% 0.180 240) */
+  --accent-hover: 70% 0.190 240;
+  --accent-muted: 65% 0.060 240;   /* low-saturation accent for bg tints */
+  --accent-fg:    98% 0.005 240;   /* text on accent bg */
+
+  /* ─── Semantic ───────────────────────────────────────────────────────────── */
+  --success:      72% 0.170 145;   /* green */
+  --success-muted: 72% 0.050 145;
+  --warning:      80% 0.180 85;    /* amber */
+  --warning-muted: 80% 0.060 85;
+  --danger:       62% 0.220 25;    /* red */
+  --danger-muted: 62% 0.070 25;
+  --info:         70% 0.160 225;   /* sky blue */
+  --info-muted:   70% 0.050 225;
+
+  /* ─── Node Port Colors ───────────────────────────────────────────────────── */
+  --port-string:  72% 0.170 145;   /* green */
+  --port-number:  68% 0.190 50;    /* orange */
+  --port-boolean: 65% 0.180 240;   /* blue */
+  --port-json:    75% 0.150 290;   /* purple */
+  --port-file:    70% 0.160 25;    /* warm red */
+  --port-image:   80% 0.180 85;    /* yellow */
+  --port-audio:   72% 0.200 320;   /* pink */
+  --port-vector:  65% 0.200 195;   /* cyan */
+  --port-any:     50% 0.010 260;   /* gray */
+
+  /* ─── Misc ───────────────────────────────────────────────────────────────── */
+  --radius-sm: 6px;
+  --radius:    8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+}
+
+[data-theme="light"] {
+  --bg-base:      97% 0.005 260;
+  --bg-surface-1: 95% 0.006 260;
+  --bg-surface-2: 93% 0.007 260;
+  --bg-surface-3: 91% 0.008 260;
+  --bg-surface-4: 89% 0.009 260;
+  --bg-surface-5: 87% 0.010 260;
+  --bg-surface-6: 85% 0.012 260;
+
+  --border:       80% 0.012 260;
+
+  --fg:           8% 0.012 260;
+  --fg-muted:     45% 0.015 260;
+  --fg-subtle:    60% 0.010 260;
+  --fg-disabled:  70% 0.008 260;
+
+  --accent:       55% 0.200 240;
+  --accent-hover: 50% 0.210 240;
+  --accent-muted: 92% 0.040 240;
+  --accent-fg:    98% 0.005 240;
+
+  --success:      42% 0.160 145;
+  --success-muted: 94% 0.040 145;
+  --warning:      50% 0.160 85;
+  --warning-muted: 96% 0.040 85;
+  --danger:       48% 0.220 25;
+  --danger-muted: 96% 0.050 25;
+  --info:         48% 0.180 225;
+  --info-muted:   94% 0.040 225;
+}

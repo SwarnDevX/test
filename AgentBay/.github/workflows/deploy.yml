@@ -1,0 +1,203 @@
+name: Deploy
+
+# Runs on version tags: v1.2.3
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false   # never cancel an in-flight deploy
+
+env:
+  NODE_VERSION: '22'
+  PNPM_VERSION: '9.15.4'
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}/agentbay
+
+jobs:
+  # ────────────────────────────────────────────────────────────────────────────
+  # Job 1: Build and push Docker images to GHCR (api, realtime, worker)
+  # ────────────────────────────────────────────────────────────────────────────
+  build-images:
+    name: Build & Push ${{ matrix.service }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [api, realtime, worker]
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_PREFIX }}-${{ matrix.service }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix=sha-
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/${{ matrix.service }}/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=${{ matrix.service }}
+          cache-to:   type=gha,scope=${{ matrix.service }},mode=max
+          build-args: |
+            GIT_SHA=${{ github.sha }}
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # Job 2: Deploy web to Vercel (independent of image build)
+  # ────────────────────────────────────────────────────────────────────────────
+  deploy-web:
+    name: Deploy Web → Vercel
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://agentbay.xyz
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Deploy to Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          pnpm --package=vercel dlx vercel \
+            --token=$VERCEL_TOKEN \
+            --prod \
+            --yes \
+            --cwd apps/web
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # Job 3: Deploy backend services to Railway (after images are pushed)
+  # ────────────────────────────────────────────────────────────────────────────
+  deploy-railway:
+    name: Deploy ${{ matrix.service }} → Railway
+    needs: build-images
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - service: api
+            railway_service: ${{ vars.RAILWAY_SERVICE_API }}
+          - service: realtime
+            railway_service: ${{ vars.RAILWAY_SERVICE_REALTIME }}
+          - service: worker
+            railway_service: ${{ vars.RAILWAY_SERVICE_WORKER }}
+    environment:
+      name: production
+
+    steps:
+      - name: Compute image tag
+        id: tag
+        run: echo "image=${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:sha-$(echo ${{ github.sha }} | head -c 7)" >> $GITHUB_OUTPUT
+
+      # Use Railway's GraphQL API to update the service image and trigger redeploy.
+      # Prereq: set RAILWAY_TOKEN, RAILWAY_PROJECT_ID, RAILWAY_ENVIRONMENT_ID in secrets.
+      # Set RAILWAY_SERVICE_API / _REALTIME / _WORKER as repository variables.
+      - name: Update Railway service image
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          curl -s -f -X POST \
+            -H "Authorization: Bearer $RAILWAY_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "query": "mutation UpdateService($id: String!, $img: String!) { serviceInstanceUpdate(serviceId: $id, input: { source: { image: $img } }) }",
+              "variables": {
+                "id": "${{ matrix.railway_service }}",
+                "img": "${{ steps.tag.outputs.image }}"
+              }
+            }' \
+            https://backboard.railway.app/graphql/v2
+
+      - name: Trigger Railway redeploy
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          curl -s -f -X POST \
+            -H "Authorization: Bearer $RAILWAY_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "query": "mutation Redeploy($id: String!) { serviceInstanceRedeploy(serviceId: $id) }",
+              "variables": { "id": "${{ matrix.railway_service }}" }
+            }' \
+            https://backboard.railway.app/graphql/v2
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # Job 4: Post-deploy smoke test
+  # ────────────────────────────────────────────────────────────────────────────
+  smoke-test:
+    name: Smoke test
+    needs: [deploy-web, deploy-railway]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Wait for Railway to settle
+        run: sleep 30
+
+      - name: Check API health
+        run: |
+          status=$(curl -s -o /dev/null -w '%{http_code}' https://api.agentbay.xyz/health)
+          if [ "$status" != "200" ]; then
+            echo "API health check failed: HTTP $status"
+            exit 1
+          fi
+
+      - name: Check web homepage
+        run: |
+          status=$(curl -s -o /dev/null -w '%{http_code}' https://agentbay.xyz)
+          if [ "$status" != "200" ]; then
+            echo "Web homepage failed: HTTP $status"
+            exit 1
+          fi
+
+      - name: Notify on failure
+        if: failure()
+        uses: slackapi/slack-github-action@v2
+        with:
+          payload: |
+            {
+              "text": ":red_circle: Deploy ${{ github.ref_name }} smoke test FAILED. Check: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

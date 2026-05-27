@@ -1,0 +1,56 @@
+That's because when I created the ZIP, I intentionally excluded the images to keep the file small — 500 images would have made it huge. The images were generated and used during training, but weren't packed in.
+
+**To generate the actual dataset images on your machine, just run this:**
+
+```bash
+# Step 1 — Install dependencies
+pip install opencv-python numpy scikit-learn scipy matplotlib
+
+# Step 2 — Go into the project folder
+cd vscan_impl
+
+# Step 3 — Generate the dataset
+python3 dataset/generator.py
+```
+
+This will create two folders inside `dataset/`:
+- `dataset/images/` — 500 parking lot images (`img_00000.jpg` to `img_00499.jpg`)
+- `dataset/masks/` — 500 free-space masks
+
+Then run the full pipeline:
+
+```bash
+python3 main.py
+```
+
+It will train the models, evaluate all 5 modules, and save output images in the `outputs/` folder.
+
+---
+
+**Why was `annotations.json` included but not images?**
+
+`annotations.json` is a small text file (~2MB) that stores all the slot coordinates, vehicle classes, and metadata for every image. The actual image files are large and get regenerated from `generator.py` using the same random seed logic. Think of it like this — `generator.py` is the recipe, `annotations.json` is the ingredient list, and the images are the actual food that gets cooked fresh on your machine.
+
+---
+
+**Expected folder structure after running:**
+
+```
+vscan_impl/
+├── dataset/
+│   ├── generator.py
+│   ├── annotations.json      ← already present
+│   ├── images/               ← created after running generator
+│   │   ├── img_00000.jpg
+│   │   ├── img_00001.jpg
+│   │   └── ... (500 images)
+│   └── masks/                ← created after running generator
+│       ├── mask_00000.png
+│       └── ... (500 masks)
+├── vscan/
+├── models/                   ← created after running main.py
+├── outputs/                  ← created after running main.py
+└── main.py
+```
+
+Takes about 3–5 minutes on a normal laptop to generate everything.

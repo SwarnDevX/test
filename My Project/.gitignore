@@ -1,9 +1,44 @@
-node_modules/
-dist/
-.env
-*.env.local
-.DS_Store
-*.log
-coverage/
-.vite/
+# Dependencies
+node_modules
+.pnpm-store
 
+# Build outputs
+dist
+.next
+out
+build
+
+# Turbo
+.turbo
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Database
+*.db
+*.sqlite
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea
+.vscode
+*.swp
+
+# Testing
+coverage
+playwright-report
+test-results
+
+# Misc
+.cache
+*.tsbuildinfo

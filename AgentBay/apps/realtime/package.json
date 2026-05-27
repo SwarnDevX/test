@@ -1,0 +1,32 @@
+{
+  "name": "@agentbay/realtime",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --clean",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --max-warnings 0",
+    "lint:fix": "eslint src --fix",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@agentbay/observability": "workspace:*",
+    "@agentbay/shared": "workspace:*",
+    "@socket.io/redis-adapter": "^8.3.0",
+    "ioredis": "^5.10.1",
+    "jose": "^5.10.0",
+    "pino": "^9.7.0",
+    "socket.io": "^4.8.3",
+    "zod": "^3.24.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.17",
+    "tsup": "^8.5.1",
+    "tsx": "^4.22.3"
+  }
+}

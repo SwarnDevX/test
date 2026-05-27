@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: agentbay_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: agentbay
+      POSTGRES_PASSWORD: agentbay_dev_password
+      POSTGRES_DB: agentbay
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/db/init.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agentbay -d agentbay"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  redis:
+    image: redis:7-alpine
+    container_name: agentbay_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass agentbay_redis_dev
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "agentbay_redis_dev", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+
+volumes:
+  postgres_data:
+    name: agentbay_postgres_data
+  redis_data:
+    name: agentbay_redis_data

@@ -1,0 +1,41 @@
+{
+  "name": "@agentbay/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --clean",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --max-warnings 0",
+    "lint:fix": "eslint src --fix",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@agentbay/contracts": "workspace:*",
+    "@agentbay/db": "workspace:*",
+    "bullmq": "^5.77.3",
+    "jose": "^5.10.0",
+    "@agentbay/observability": "workspace:*",
+    "@agentbay/shared": "workspace:*",
+    "@agentbay/x402": "workspace:*",
+    "@hono/node-server": "^2.0.4",
+    "@hono/zod-validator": "^0.4.3",
+    "hono": "^4.12.23",
+    "ioredis": "^5.10.1",
+    "pino": "^9.7.0",
+    "siwe": "^2.3.2",
+    "ulid": "^2.3.0",
+    "viem": "^2.31.3",
+    "zod": "^3.24.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.17",
+    "tsup": "^8.5.1",
+    "tsx": "^4.22.3",
+    "vitest": "^2.2.0"
+  }
+}

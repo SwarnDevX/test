@@ -1,23 +1,29 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "target": "ES2020",
-    "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "target": "ES2022",
+    "lib": ["dom", "dom.iterable", "ES2022"],
     "module": "ESNext",
-    "skipLibCheck": true,
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx",
-    "strict": true,
-    "baseUrl": ".",
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitAny": false,
+    "declaration": false,
+    "declarationMap": false,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [{ "name": "next" }],
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"],
+      "@flowforge/api": ["../../apps/api/src/routers/index.ts"],
+      "@flowforge/ui": ["../../packages/ui/src/index.ts"],
+      "@flowforge/shared": ["../../packages/shared/src/index.ts"],
+      "@flowforge/nodes-sdk": ["../../packages/nodes-sdk/src/index.ts"],
+      "@flowforge/db": ["../../packages/db/src/index.ts"]
     }
   },
-  "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
 }
-
