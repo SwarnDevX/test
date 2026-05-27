@@ -139,6 +139,9 @@ app:
     submission-queue: submissions.queue
     submission-exchange: submissions.exchange
     submission-routing-key: submission
+  sandbox:
+    enable-seccomp: ${SANDBOX_ENABLE_SECCOMP:false}
+    seccomp-profile: ${SANDBOX_SECCOMP_PROFILE:/app/infra/seccomp/judge.json}
 
 logging:
   level:
