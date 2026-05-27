@@ -1,5 +1,7 @@
 package dev.codecrafter.submission.messaging;
 
+import dev.codecrafter.stats.StatsSyncService;
+import dev.codecrafter.submission.entity.Submission;
 import dev.codecrafter.submission.entity.SubmissionStatus;
 import dev.codecrafter.submission.repository.SubmissionRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ public class VerdictListener {
 
     private final SubmissionRepository submissionRepository;
     private final SimpMessagingTemplate ws;
+    private final StatsSyncService statsSyncService;
 
     @RabbitListener(queues = "${app.rabbitmq.verdict-queue}")
     @Transactional
@@ -40,11 +43,13 @@ public class VerdictListener {
             }
 
             submissionRepository.save(sub);
+
+            if (status == SubmissionStatus.ACCEPTED) {
+                statsSyncService.onAccepted(sub.getUser().getId(), sub.getProblem().getId());
+            }
         });
 
-        // Push to WebSocket — frontend subscribes to /topic/submissions/{id}
         ws.convertAndSend("/topic/submissions/" + msg.submissionId(), msg);
-        // Also push to user-specific queue for notification panel
         ws.convertAndSendToUser(msg.userId().toString(), "/queue/verdicts", msg);
     }
 
