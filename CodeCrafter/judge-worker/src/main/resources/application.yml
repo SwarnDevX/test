@@ -47,9 +47,8 @@ management:
         enabled: true
 
 judge:
-  docker:
-    host: ${JUDGE_DOCKER_HOST:unix:///var/run/docker.sock}
-    socket-timeout-seconds: 30
+  submission-queue: ${JUDGE_SUBMISSION_QUEUE:submissions.queue}
+  verdict-queue: ${JUDGE_VERDICT_QUEUE:verdicts.queue}
   seccomp-profile: ${JUDGE_SECCOMP_PROFILE:/profiles/judge.json}
   sandbox:
     memory-limit-mb: 256
