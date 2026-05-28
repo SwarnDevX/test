@@ -17,6 +17,7 @@ export default function AuthCallbackPage() {
     const userId = searchParams.get("userId");
     const email = searchParams.get("email");
     const username = searchParams.get("username");
+    const roles = searchParams.get("roles") ?? "";
 
     if (!accessToken || !refreshToken) {
       router.replace("/auth/error?error=OAuthCallbackError");
@@ -29,6 +30,7 @@ export default function AuthCallbackPage() {
       userId: userId ?? "",
       email: email ?? "",
       username: username ?? "",
+      roles,
       redirect: false,
     }).then((result) => {
       if (result?.error) {

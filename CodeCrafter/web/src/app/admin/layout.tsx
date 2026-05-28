@@ -25,7 +25,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     if (status === "loading") return;
-    const roles: string[] = (session?.user as any)?.roles ?? [];
+    const roles: string[] = session?.roles ?? [];
     if (!roles.includes("ROLE_ADMIN")) {
       router.replace("/");
     }

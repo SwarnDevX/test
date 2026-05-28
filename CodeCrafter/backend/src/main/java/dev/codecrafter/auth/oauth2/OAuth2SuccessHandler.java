@@ -33,6 +33,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String email = authentication.getName();
         userRepository.findByEmailWithRoles(email).ifPresentOrElse(user -> {
             AuthResponse tokens = authService.buildTokenPair(user);
+            String roles = String.join(",", tokens.roles());
             String redirectUrl = UriComponentsBuilder
                 .fromUriString(frontendUrl + "/auth/callback")
                 .queryParam("accessToken", tokens.accessToken())
@@ -40,6 +41,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .queryParam("userId", tokens.userId())
                 .queryParam("email", tokens.email())
                 .queryParam("username", tokens.username())
+                .queryParam("roles", roles)
                 .build().toUriString();
             try {
                 getRedirectStrategy().sendRedirect(request, response, redirectUrl);

@@ -34,16 +34,20 @@ export const authOptions: NextAuthOptions = {
         userId: {},
         email: {},
         username: {},
+        roles: {},
       },
       async authorize(credentials) {
         if (!credentials?.accessToken) return null;
+        const roles = credentials.roles
+          ? credentials.roles.split(",").filter(Boolean)
+          : [];
         return {
           id: credentials.userId,
           email: credentials.email,
           username: credentials.username,
           accessToken: credentials.accessToken,
           refreshToken: credentials.refreshToken,
-          roles: [],
+          roles,
         };
       },
     }),
