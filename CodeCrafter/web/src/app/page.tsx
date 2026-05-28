@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
+import { DailyChallengeBanner } from "@/components/challenge/DailyChallengeBanner";
 import {
   Code2,
   Zap,
@@ -167,7 +168,7 @@ export default function HomePage() {
           Track everything.
         </p>
 
-        <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+        <div className="flex flex-col items-center justify-center gap-4 sm:flex-row mb-12">
           <Button
             size="lg"
             className="gap-2 bg-emerald-600 text-white hover:bg-emerald-500"
@@ -181,6 +182,11 @@ export default function HomePage() {
           <Button size="lg" variant="outline" asChild>
             <Link href="/problems">Browse problems</Link>
           </Button>
+        </div>
+
+        {/* Daily challenge — silently omitted if none scheduled */}
+        <div className="mx-auto max-w-xl">
+          <DailyChallengeBanner />
         </div>
       </section>
 

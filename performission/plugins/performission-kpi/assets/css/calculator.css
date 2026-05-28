@@ -1,0 +1,21 @@
+/* KPI Calculator styles — imported via performission-child/style.css globals */
+/* This file adds any print/overrides not covered by the global style.css */
+
+.pm-kpi-form-wrap {
+  width: 100%;
+}
+
+.pm-kpi-form {
+  width: 100%;
+}
+
+/* Number input — hide browser spinners */
+.pm-kpi-field input[type="number"]::-webkit-inner-spin-button,
+.pm-kpi-field input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.pm-kpi-field input[type="number"] {
+  -moz-appearance: textfield;
+}

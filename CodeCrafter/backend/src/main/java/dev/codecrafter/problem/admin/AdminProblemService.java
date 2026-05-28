@@ -3,7 +3,14 @@ package dev.codecrafter.problem.admin;
 import dev.codecrafter.common.exception.ApiException;
 import dev.codecrafter.problem.entity.*;
 import dev.codecrafter.problem.repository.*;
+import dev.codecrafter.submission.entity.Submission;
+import dev.codecrafter.submission.entity.SubmissionStatus;
+import dev.codecrafter.submission.messaging.JudgeJobMessage;
+import dev.codecrafter.submission.repository.SubmissionRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,6 +18,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AdminProblemService {
 
     private final ProblemRepository problemRepository;
@@ -18,6 +26,14 @@ public class AdminProblemService {
     private final SampleTestCaseRepository sampleTestCaseRepository;
     private final TestCaseRepository testCaseRepository;
     private final ProblemLanguageRepository problemLanguageRepository;
+    private final SubmissionRepository submissionRepository;
+    private final RabbitTemplate rabbitTemplate;
+
+    @Value("${app.rabbitmq.submission-exchange}")
+    private String submissionExchange;
+
+    @Value("${app.rabbitmq.submission-routing-key}")
+    private String submissionRoutingKey;
 
     @Transactional
     public Problem createProblem(CreateProblemRequest req) {
@@ -125,5 +141,44 @@ public class AdminProblemService {
             .orElseThrow(() -> ApiException.notFound("Problem not found: " + slug));
         problem.setActive(active);
         problemRepository.save(problem);
+    }
+
+    /** Re-queue every submission for a problem so verdicts are recomputed with the latest test cases. */
+    @Transactional
+    public int rejudge(String slug) {
+        Problem problem = problemRepository.findAll().stream()
+            .filter(p -> p.getSlug().equals(slug))
+            .findFirst()
+            .orElseThrow(() -> ApiException.notFound("Problem not found: " + slug));
+
+        List<Submission> submissions = submissionRepository.findByProblemId(problem.getId());
+        for (Submission sub : submissions) {
+            sub.setStatus(SubmissionStatus.QUEUED);
+            submissionRepository.save(sub);
+            rabbitTemplate.convertAndSend(submissionExchange, submissionRoutingKey,
+                new JudgeJobMessage(
+                    sub.getId(), sub.getUser().getId(), problem.getId(),
+                    sub.getLanguage(), sub.getSourceCode(),
+                    problem.getTimeLimitMs(), problem.getMemoryLimitMb()
+                ));
+        }
+        log.info("Re-queued {} submissions for problem '{}'", submissions.size(), slug);
+        return submissions.size();
+    }
+
+    @Transactional
+    public TestCase addTestCase(String slug, String input, String expectedOutput, boolean isSample) {
+        Problem problem = problemRepository.findAll().stream()
+            .filter(p -> p.getSlug().equals(slug)).findFirst()
+            .orElseThrow(() -> ApiException.notFound("Problem not found: " + slug));
+        int order = testCaseRepository.findByProblemIdOrderBySortOrderAsc(problem.getId()).size();
+        return testCaseRepository.save(TestCase.builder()
+            .problem(problem).input(input).expectedOutput(expectedOutput)
+            .sortOrder(order).isSample(isSample).build());
+    }
+
+    @Transactional
+    public void deleteTestCase(Long testCaseId) {
+        testCaseRepository.deleteById(testCaseId);
     }
 }

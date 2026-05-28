@@ -1,6 +1,7 @@
 package dev.codecrafter.submission;
 
 import dev.codecrafter.common.exception.ApiException;
+import dev.codecrafter.infra.metrics.SubmissionMetrics;
 import dev.codecrafter.problem.entity.Problem;
 import dev.codecrafter.problem.repository.ProblemRepository;
 import dev.codecrafter.submission.dto.SubmissionDetailDto;
@@ -31,6 +32,7 @@ public class SubmissionService {
     private final ProblemRepository problemRepository;
     private final UserRepository userRepository;
     private final RabbitTemplate rabbitTemplate;
+    private final SubmissionMetrics submissionMetrics;
 
     @Value("${app.rabbitmq.submission-exchange}")
     private String submissionExchange;
@@ -67,6 +69,7 @@ public class SubmissionService {
         );
 
         rabbitTemplate.convertAndSend(submissionExchange, submissionRoutingKey, job);
+        submissionMetrics.recordQueued(req.language());
         log.info("Queued submission {} for problem {} by user {}", submission.getId(), slug, userId);
 
         return SubmissionDto.from(submission);

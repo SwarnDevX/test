@@ -1,5 +1,7 @@
 package dev.codecrafter.user;
 
+import dev.codecrafter.contest.RatingService;
+import dev.codecrafter.contest.dto.ContestRatingHistoryDto;
 import dev.codecrafter.security.AppUserDetails;
 import dev.codecrafter.user.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -18,6 +21,7 @@ import java.util.Map;
 public class UserController {
 
     private final UserService userService;
+    private final RatingService ratingService;
 
     @GetMapping("/users/me")
     @Operation(summary = "Get the authenticated user's own profile")
@@ -58,5 +62,11 @@ public class UserController {
     @Operation(summary = "Get a user's public profile by username")
     public PublicProfileDto getPublicProfile(@PathVariable String username) {
         return userService.getPublicProfile(username);
+    }
+
+    @GetMapping("/u/{username}/rating-history")
+    @Operation(summary = "Get a user's contest rating history")
+    public List<ContestRatingHistoryDto> getRatingHistory(@PathVariable String username) {
+        return ratingService.getHistoryByUsername(username);
     }
 }

@@ -11,6 +11,7 @@ import { SolvedDonut } from "@/components/stats/SolvedDonut";
 import { TagBarChart } from "@/components/stats/TagBarChart";
 import { LanguageBar } from "@/components/stats/LanguageBar";
 import { BadgeGrid } from "@/components/stats/BadgeGrid";
+import { RatingGraph } from "@/components/stats/RatingGraph";
 import type { UserStatsDetail } from "@/types/stats";
 
 const BACKEND = process.env.BACKEND_URL ?? "http://localhost:8080";
@@ -185,6 +186,16 @@ export default async function PublicProfilePage({ params }: { params: { username
               </CardContent>
             </Card>
           )}
+
+          {/* Contest rating */}
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-semibold text-zinc-300">Contest Rating</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <RatingGraph username={profile.username} />
+            </CardContent>
+          </Card>
 
           {/* Badges */}
           <Card>

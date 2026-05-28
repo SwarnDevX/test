@@ -65,6 +65,7 @@ public class JudgeService {
             String overallVerdict = "ACCEPTED";
             Integer failingIndex = null;
             long maxRuntimeMs = 0;
+            long maxMemoryKb = 0;
 
             for (int i = 0; i < testCases.size(); i++) {
                 TestCase tc = testCases.get(i);
@@ -75,6 +76,7 @@ public class JudgeService {
                 String verdict = caseVerdict(exec, actual, expected);
 
                 maxRuntimeMs = Math.max(maxRuntimeMs, exec.runtimeMs());
+                maxMemoryKb  = Math.max(maxMemoryKb,  exec.memoryKb());
 
                 results.add(new TestCaseResultMessage(
                     i, verdict, actual, expected, exec.stderr(), exec.runtimeMs()
@@ -96,7 +98,9 @@ public class JudgeService {
                 overallVerdict,
                 passed, testCases.size(),
                 failingIndex,
-                (int) maxRuntimeMs, null, null,
+                (int) maxRuntimeMs,
+                maxMemoryKb > 0 ? (int) maxMemoryKb : null,
+                null,
                 results
             );
 

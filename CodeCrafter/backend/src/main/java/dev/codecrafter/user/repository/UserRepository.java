@@ -1,6 +1,8 @@
 package dev.codecrafter.user.repository;
 
 import dev.codecrafter.user.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -25,4 +27,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u JOIN FETCH u.roles WHERE u.id = :id")
     Optional<User> findByIdWithRoles(Long id);
+
+    Page<User> findByEmailContainingIgnoreCaseOrUsernameContainingIgnoreCase(
+        String email, String username, Pageable pageable);
 }

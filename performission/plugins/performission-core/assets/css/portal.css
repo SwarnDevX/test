@@ -1,0 +1,327 @@
+/* PerforMission — Portal Design System
+   Used across the ambassador and client dashboards.
+   Dark-mode first, accent colour #6c63ff (purple).
+   Works inside any Elementor section width. */
+
+/* ── Design tokens ────────────────────────────────────────────────────────── */
+:root {
+  --pm-bg:          #0f1117;
+  --pm-surface:     #1a1e2e;
+  --pm-surface-2:   #222840;
+  --pm-border:      rgba(255, 255, 255, 0.08);
+  --pm-accent:      #6c63ff;
+  --pm-accent-dark: #574fd1;
+  --pm-text:        #eef0f8;
+  --pm-text-muted:  #8890a8;
+  --pm-success:     #4ade80;
+  --pm-danger:      #f87171;
+  --pm-radius:      12px;
+  --pm-font:        'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ── Base portal wrapper ──────────────────────────────────────────────────── */
+.pm-portal {
+  font-family: var(--pm-font);
+  color: var(--pm-text);
+  background: var(--pm-bg);
+  min-height: 80vh;
+  padding: 32px 24px;
+  border-radius: var(--pm-radius);
+}
+
+/* ── Header ───────────────────────────────────────────────────────────────── */
+.pm-portal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--pm-border);
+}
+
+.pm-portal__welcome h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 4px;
+  color: var(--pm-text);
+}
+
+.pm-portal__welcome h2 span {
+  color: var(--pm-accent);
+}
+
+/* ── Role badges ──────────────────────────────────────────────────────────── */
+.pm-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.pm-badge--ambassador {
+  background: rgba(108, 99, 255, .15);
+  color: var(--pm-accent);
+  border: 1px solid rgba(108, 99, 255, .3);
+}
+
+.pm-badge--client {
+  background: rgba(74, 222, 128, .1);
+  color: var(--pm-success);
+  border: 1px solid rgba(74, 222, 128, .3);
+}
+
+/* ── Tab navigation ───────────────────────────────────────────────────────── */
+.pm-portal__nav {
+  display: flex;
+  gap: 4px;
+  background: var(--pm-surface);
+  padding: 4px;
+  border-radius: 10px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.pm-tab {
+  background: none;
+  border: none;
+  color: var(--pm-text-muted);
+  padding: 9px 18px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: .88rem;
+  font-weight: 500;
+  font-family: var(--pm-font);
+  transition: background .18s, color .18s;
+  white-space: nowrap;
+}
+
+.pm-tab:hover {
+  color: var(--pm-text);
+  background: rgba(255, 255, 255, .05);
+}
+
+.pm-tab.active {
+  background: var(--pm-accent);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ── Panels ───────────────────────────────────────────────────────────────── */
+.pm-panel {
+  display: none;
+}
+
+.pm-panel.active {
+  display: block;
+  animation: pmFadePanel .2s ease;
+}
+
+@keyframes pmFadePanel {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.pm-panel__head {
+  margin-bottom: 20px;
+}
+
+.pm-panel__head h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 4px;
+  color: var(--pm-text);
+}
+
+.pm-panel__head p {
+  font-size: .85rem;
+  color: var(--pm-text-muted);
+  margin: 0;
+}
+
+/* ── Section heading (legacy support) ────────────────────────────────────── */
+.pm-section-header h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--pm-text);
+  margin: 0 0 4px;
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────────── */
+.pm-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-size: .88rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-family: var(--pm-font);
+  transition: opacity .18s, transform .12s;
+  text-decoration: none;
+}
+
+.pm-btn:hover { opacity: .88; }
+.pm-btn:active { transform: scale(.97); }
+
+.pm-btn--primary {
+  background: var(--pm-accent);
+  color: #fff;
+}
+
+.pm-btn--secondary {
+  background: var(--pm-surface-2);
+  color: var(--pm-text);
+  border: 1px solid var(--pm-border);
+}
+
+.pm-btn--ghost {
+  background: none;
+  border: 1px solid var(--pm-border);
+  color: var(--pm-text-muted);
+}
+
+.pm-btn--ghost:hover { color: var(--pm-text); border-color: rgba(255,255,255,.2); }
+
+.pm-btn--sm { padding: 7px 16px; font-size: .82rem; }
+
+/* ── Courses grid ─────────────────────────────────────────────────────────── */
+.pm-courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+  margin-top: 12px;
+}
+
+.pm-course-card {
+  background: var(--pm-surface);
+  border: 1px solid var(--pm-border);
+  border-radius: var(--pm-radius);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color .2s, transform .15s;
+}
+
+.pm-course-card:hover {
+  border-color: var(--pm-accent);
+  transform: translateY(-2px);
+}
+
+.pm-course-card h4 {
+  font-size: .95rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--pm-text);
+  flex: 1;
+}
+
+/* ── Progress bar ─────────────────────────────────────────────────────────── */
+.pm-progress-bar {
+  height: 5px;
+  background: rgba(255,255,255,.07);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.pm-progress-bar__fill {
+  height: 100%;
+  background: var(--pm-accent);
+  border-radius: 10px;
+  transition: width .4s ease;
+}
+
+.pm-progress-label {
+  font-size: .75rem;
+  color: var(--pm-text-muted);
+}
+
+/* ── Profile card ─────────────────────────────────────────────────────────── */
+.pm-profile-card {
+  background: var(--pm-surface);
+  border: 1px solid var(--pm-border);
+  border-radius: var(--pm-radius);
+  padding: 24px;
+  margin-bottom: 16px;
+  max-width: 480px;
+}
+
+.pm-profile-card__row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--pm-border);
+  font-size: .9rem;
+}
+
+.pm-profile-card__row:last-child { border-bottom: none; }
+
+.pm-profile-card__row span { color: var(--pm-text-muted); }
+
+.pm-profile-card__row strong { color: var(--pm-text); }
+
+/* ── Loading spinner ──────────────────────────────────────────────────────── */
+.pm-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--pm-text-muted);
+  font-size: .9rem;
+  padding: 32px 0;
+  justify-content: center;
+}
+
+.pm-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(108,99,255,.3);
+  border-top-color: var(--pm-accent);
+  border-radius: 50%;
+  animation: pmSpin .7s linear infinite;
+}
+
+@keyframes pmSpin { to { transform: rotate(360deg); } }
+
+/* ── Error / info states ──────────────────────────────────────────────────── */
+.pm-error {
+  background: rgba(248,113,113,.08);
+  border: 1px solid rgba(248,113,113,.25);
+  border-radius: 8px;
+  padding: 14px 18px;
+  color: var(--pm-danger);
+  font-size: .88rem;
+}
+
+.pm-login-notice {
+  text-align: center;
+  padding: 40px;
+  color: var(--pm-text-muted);
+  font-size: .95rem;
+}
+
+.pm-login-notice a {
+  color: var(--pm-accent);
+  text-decoration: underline;
+}
+
+.pm-link { color: var(--pm-accent); }
+.pm-link:hover { text-decoration: underline; }
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .pm-portal { padding: 20px 14px; }
+  .pm-portal__header { flex-direction: column; align-items: flex-start; }
+  .pm-portal__nav { overflow-x: auto; flex-wrap: nowrap; }
+  .pm-tab { padding: 8px 14px; font-size: .82rem; }
+  .pm-courses-grid { grid-template-columns: 1fr; }
+}

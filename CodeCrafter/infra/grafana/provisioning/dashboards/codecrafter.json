@@ -1,0 +1,165 @@
+{
+  "title": "CodeCrafter Platform",
+  "uid": "codecrafter-main",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "30s",
+  "time": { "from": "now-1h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Submission Rate (RPS)",
+      "gridPos": { "x": 0, "y": 0, "w": 4, "h": 4 },
+      "targets": [{
+        "expr": "sum(rate(codecrafter_submissions_queued_total[1m]))",
+        "legendFormat": "submissions/sec"
+      }],
+      "options": { "colorMode": "background", "graphMode": "area" },
+      "fieldConfig": { "defaults": { "unit": "reqps", "thresholds": {
+        "steps": [{"color":"green","value":0},{"color":"yellow","value":80},{"color":"red","value":120}]
+      }}}
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "In-flight Submissions",
+      "gridPos": { "x": 4, "y": 0, "w": 4, "h": 4 },
+      "targets": [{
+        "expr": "codecrafter_submissions_inflight",
+        "legendFormat": "inflight"
+      }],
+      "options": { "colorMode": "background" },
+      "fieldConfig": { "defaults": { "unit": "short", "thresholds": {
+        "steps": [{"color":"green","value":0},{"color":"yellow","value":50},{"color":"red","value":200}]
+      }}}
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Error Rate",
+      "gridPos": { "x": 8, "y": 0, "w": 4, "h": 4 },
+      "targets": [{
+        "expr": "sum(rate(codecrafter_submissions_run_errors_total[5m]))",
+        "legendFormat": "errors/sec"
+      }],
+      "options": { "colorMode": "background" },
+      "fieldConfig": { "defaults": { "unit": "reqps", "thresholds": {
+        "steps": [{"color":"green","value":0},{"color":"red","value":0.1}]
+      }}}
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "API p99 Latency",
+      "gridPos": { "x": 12, "y": 0, "w": 4, "h": 4 },
+      "targets": [{
+        "expr": "histogram_quantile(0.99, sum(rate(http_server_requests_seconds_bucket{uri!~\"/actuator.*\"}[5m])) by (le))",
+        "legendFormat": "p99"
+      }],
+      "options": { "colorMode": "background" },
+      "fieldConfig": { "defaults": { "unit": "s", "thresholds": {
+        "steps": [{"color":"green","value":0},{"color":"yellow","value":0.5},{"color":"red","value":2}]
+      }}}
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "Active HTTP Connections",
+      "gridPos": { "x": 16, "y": 0, "w": 4, "h": 4 },
+      "targets": [{
+        "expr": "tomcat_connections_active_current_connections",
+        "legendFormat": "connections"
+      }],
+      "fieldConfig": { "defaults": { "unit": "short" } }
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Submission Throughput by Language",
+      "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
+      "targets": [{
+        "expr": "sum by (language) (rate(codecrafter_submissions_queued_total[1m]))",
+        "legendFormat": "{{language}}"
+      }],
+      "fieldConfig": { "defaults": { "unit": "reqps" } }
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Verdict Distribution",
+      "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 },
+      "targets": [{
+        "expr": "sum by (verdict) (rate(codecrafter_submissions_verdict_total[1m]))",
+        "legendFormat": "{{verdict}}"
+      }],
+      "fieldConfig": { "defaults": { "unit": "reqps" } }
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Submission Queue Wait Time",
+      "gridPos": { "x": 0, "y": 12, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(codecrafter_submission_queue_wait_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p50"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(codecrafter_submission_queue_wait_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p95"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(codecrafter_submission_queue_wait_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p99"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" } }
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "HTTP Request Rate by Endpoint",
+      "gridPos": { "x": 12, "y": 12, "w": 12, "h": 8 },
+      "targets": [{
+        "expr": "sum by (uri, method) (rate(http_server_requests_seconds_count{uri!~\"/actuator.*\"}[1m]))",
+        "legendFormat": "{{method}} {{uri}}"
+      }],
+      "fieldConfig": { "defaults": { "unit": "reqps" } }
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "JVM Heap Usage",
+      "gridPos": { "x": 0, "y": 20, "w": 8, "h": 6 },
+      "targets": [
+        { "expr": "jvm_memory_used_bytes{area=\"heap\"}", "legendFormat": "used" },
+        { "expr": "jvm_memory_max_bytes{area=\"heap\"}", "legendFormat": "max" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "bytes" } }
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "HikariCP Connection Pool",
+      "gridPos": { "x": 8, "y": 20, "w": 8, "h": 6 },
+      "targets": [
+        { "expr": "hikaricp_connections_active", "legendFormat": "active" },
+        { "expr": "hikaricp_connections_idle",   "legendFormat": "idle"   },
+        { "expr": "hikaricp_connections_max",    "legendFormat": "max"    }
+      ],
+      "fieldConfig": { "defaults": { "unit": "short" } }
+    },
+    {
+      "id": 12,
+      "type": "timeseries",
+      "title": "RabbitMQ Queue Depth (via Spring metrics)",
+      "gridPos": { "x": 16, "y": 20, "w": 8, "h": 6 },
+      "targets": [{
+        "expr": "rabbitmq_queue_messages_ready",
+        "legendFormat": "{{queue}}"
+      }],
+      "fieldConfig": { "defaults": { "unit": "short" } }
+    }
+  ]
+}

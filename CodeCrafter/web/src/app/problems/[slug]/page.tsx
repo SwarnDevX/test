@@ -12,6 +12,9 @@ import Link from "next/link";
 import api from "@/lib/api";
 import { CodeEditor } from "@/components/editor/CodeEditor";
 import { ProblemDescription } from "@/components/problem/ProblemDescription";
+import { EditorialView } from "@/components/problem/EditorialView";
+import { SolutionList } from "@/components/problem/SolutionList";
+import { DiscussTab } from "@/components/problem/DiscussTab";
 import { ConsolePanel } from "@/components/problem/ConsolePanel";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -53,6 +56,7 @@ export default function ProblemPage() {
     staleTime: 60_000,
   });
 
+  const [activeTab, setActiveTab] = useState<"description" | "editorial" | "solutions" | "discuss">("description");
   const [language, setLanguage] = useState("java");
   const [code, setCode] = useState("");
   const [runResult, setRunResult] = useState<RunResult | null>(null);
@@ -185,13 +189,35 @@ export default function ProblemPage() {
       <div className="flex-1 overflow-hidden">
         <Group orientation="horizontal" className="h-full">
           <Panel defaultSize={38} minSize={20} maxSize={60}>
-            {isLoading ? (
-              <div className="p-5 space-y-4">
-                {[...Array(6)].map((_, i) => (
-                  <Skeleton key={i} className={`h-4 ${i === 0 ? "w-3/4" : "w-full"}`} />
+            <div className="h-full flex flex-col">
+              {/* Tab bar */}
+              <div className="flex gap-0 border-b border-zinc-800 flex-shrink-0 bg-zinc-950">
+                {(["description","editorial","solutions","discuss"] as const).map(tab => (
+                  <button key={tab} onClick={() => setActiveTab(tab)}
+                    className={`px-3 py-2 text-xs font-medium capitalize transition-colors border-b-2 -mb-px ${
+                      activeTab === tab
+                        ? "border-emerald-500 text-emerald-400"
+                        : "border-transparent text-zinc-500 hover:text-zinc-300"
+                    }`}>
+                    {tab}
+                  </button>
                 ))}
               </div>
-            ) : problem ? <ProblemDescription problem={problem} /> : null}
+              <div className="flex-1 overflow-hidden">
+                {activeTab === "description" && (
+                  isLoading ? (
+                    <div className="p-5 space-y-4">
+                      {[...Array(6)].map((_, i) => (
+                        <Skeleton key={i} className={`h-4 ${i === 0 ? "w-3/4" : "w-full"}`} />
+                      ))}
+                    </div>
+                  ) : problem ? <ProblemDescription problem={problem} /> : null
+                )}
+                {activeTab === "editorial" && <EditorialView slug={slug} />}
+                {activeTab === "solutions" && <SolutionList slug={slug} />}
+                {activeTab === "discuss" && <DiscussTab slug={slug} />}
+              </div>
+            </div>
           </Panel>
           <Separator className="w-1 bg-zinc-800 hover:bg-emerald-600 transition-colors cursor-col-resize" />
           <Panel defaultSize={62} minSize={30}>

@@ -52,6 +52,11 @@ public class BadgeEngine {
         award(user, "night-owl",  hasNightSubmission);
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void awardBadge(Long userId, String slug) {
+        userRepository.findById(userId).ifPresent(user -> award(user, slug, true));
+    }
+
     private void award(User user, String slug, boolean condition) {
         if (!condition) return;
         if (userBadgeRepository.existsByUserIdAndBadgeSlug(user.getId(), slug)) return;

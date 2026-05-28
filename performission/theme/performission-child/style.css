@@ -1,0 +1,342 @@
+/*
+ Theme Name:   PerforMission Child
+ Theme URI:    https://performission.com
+ Description:  Child theme for PerforMission — inherits Hello Elementor as parent.
+ Author:       PerforMission
+ Template:     hello-elementor
+ Version:      1.0.0
+ Text Domain:  performission-child
+*/
+
+/* ── Brand variables ─────────────────────────────────────────────────────── */
+:root {
+  --pm-accent:      #6c63ff;
+  --pm-accent-dark: #574fd1;
+  --pm-bg:          #0f1117;
+  --pm-surface:     #1a1e2e;
+  --pm-text:        #eef0f8;
+  --pm-text-muted:  #8890a8;
+  --pm-font-body:   'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --pm-font-head:   'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ── Global resets ───────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  font-family: var(--pm-font-body);
+  background-color: var(--pm-bg);
+  color: var(--pm-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--pm-accent); }
+a:hover { color: var(--pm-accent-dark); }
+
+img { max-width: 100%; height: auto; display: block; }
+
+/* ── Elementor global overrides ──────────────────────────────────────────── */
+/* Ensure page-level section backgrounds respect dark theme */
+.elementor-section, .e-con {
+  background-color: transparent;
+}
+
+/* ── Ambassador archive page ─────────────────────────────────────────────── */
+.pm-ambassadors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 28px;
+  padding: 40px 0;
+}
+
+.pm-ambassador-card {
+  background: var(--pm-surface);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform .2s, box-shadow .2s;
+  text-decoration: none;
+  color: var(--pm-text);
+  display: flex;
+  flex-direction: column;
+}
+
+.pm-ambassador-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(108,99,255,.18);
+  border-color: var(--pm-accent);
+  color: var(--pm-text);
+  text-decoration: none;
+}
+
+.pm-ambassador-card__thumb {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  background: rgba(108,99,255,.1);
+}
+
+.pm-ambassador-card__thumb-placeholder {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(108,99,255,.08);
+  font-size: 3rem;
+  color: rgba(108,99,255,.4);
+}
+
+.pm-ambassador-card__body {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pm-ambassador-card__name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.pm-ambassador-card__role {
+  font-size: .82rem;
+  color: var(--pm-accent);
+  font-weight: 500;
+}
+
+.pm-ambassador-card__location {
+  font-size: .8rem;
+  color: var(--pm-text-muted);
+}
+
+.pm-ambassador-card__stats {
+  margin-top: auto;
+  padding-top: 14px;
+  font-size: .8rem;
+  color: var(--pm-text-muted);
+  border-top: 1px solid rgba(255,255,255,.06);
+}
+
+/* ── Single ambassador page ──────────────────────────────────────────────── */
+.pm-ambassador-single {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 60px 24px;
+}
+
+.pm-ambassador-single__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 32px;
+  margin-bottom: 40px;
+}
+
+.pm-ambassador-single__avatar {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--pm-accent);
+  flex-shrink: 0;
+}
+
+.pm-ambassador-single__info h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0 0 6px;
+}
+
+.pm-ambassador-single__role {
+  font-size: .95rem;
+  color: var(--pm-accent);
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+.pm-ambassador-single__location {
+  font-size: .88rem;
+  color: var(--pm-text-muted);
+  margin: 0 0 16px;
+}
+
+.pm-ambassador-single__socials {
+  display: flex;
+  gap: 10px;
+}
+
+.pm-social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.1);
+  font-size: .8rem;
+  color: var(--pm-text-muted);
+  text-decoration: none;
+  transition: border-color .2s, color .2s;
+}
+
+.pm-social-link:hover {
+  border-color: var(--pm-accent);
+  color: var(--pm-accent);
+  text-decoration: none;
+}
+
+.pm-ambassador-single__bio {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--pm-text);
+  margin-bottom: 40px;
+}
+
+.pm-ambassador-single__stats {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 24px;
+  background: var(--pm-surface);
+  border-radius: 12px;
+  margin-bottom: 40px;
+}
+
+.pm-stat {
+  text-align: center;
+  flex: 1;
+  min-width: 100px;
+}
+
+.pm-stat__value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--pm-accent);
+  display: block;
+}
+
+.pm-stat__label {
+  font-size: .78rem;
+  color: var(--pm-text-muted);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+/* ── KPI Calculator ───────────────────────────────────────────────────────── */
+.pm-kpi-calculator {
+  background: var(--pm-surface);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 16px;
+  padding: 40px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.pm-kpi-calculator h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 8px;
+  color: var(--pm-text);
+}
+
+.pm-kpi-desc {
+  font-size: .88rem;
+  color: var(--pm-text-muted);
+  margin: 0 0 28px;
+}
+
+.pm-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.pm-kpi-field label {
+  display: block;
+  font-size: .8rem;
+  color: var(--pm-text-muted);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.pm-kpi-field input {
+  width: 100%;
+  background: var(--pm-bg);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 8px;
+  color: var(--pm-text);
+  padding: 10px 14px;
+  font-size: .9rem;
+  transition: border-color .2s;
+  font-family: var(--pm-font-body);
+  box-sizing: border-box;
+}
+
+.pm-kpi-field input:focus {
+  outline: none;
+  border-color: var(--pm-accent);
+}
+
+.pm-kpi-btn {
+  background: var(--pm-accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 28px;
+  font-size: .95rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--pm-font-body);
+  transition: opacity .2s;
+}
+
+.pm-kpi-btn:hover { opacity: .88; }
+.pm-kpi-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+.pm-kpi-btn--secondary {
+  background: rgba(255,255,255,.08);
+  color: var(--pm-text-muted);
+  margin-top: 16px;
+}
+
+.pm-kpi-result {
+  margin-top: 28px;
+  padding: 24px;
+  background: rgba(108,99,255,.07);
+  border: 1px solid rgba(108,99,255,.2);
+  border-radius: 10px;
+}
+
+.pm-kpi-result h4 {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  color: var(--pm-accent);
+  font-weight: 700;
+}
+
+#pm-kpi-result-text {
+  font-size: .9rem;
+  line-height: 1.7;
+  color: var(--pm-text);
+  white-space: pre-line;
+}
+
+#pm-kpi-error {
+  background: rgba(248,113,113,.08);
+  border: 1px solid rgba(248,113,113,.25);
+  border-radius: 6px;
+  padding: 10px 14px;
+  color: #f87171;
+  font-size: .84rem;
+  margin-bottom: 16px;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .pm-ambassador-single__header { flex-direction: column; gap: 20px; }
+  .pm-ambassador-single__avatar { width: 100px; height: 100px; }
+  .pm-kpi-calculator { padding: 24px 16px; }
+}

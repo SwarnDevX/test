@@ -16,6 +16,7 @@ public interface ProblemRepository extends JpaRepository<Problem, Long>,
 
     boolean existsBySlug(String slug);
     boolean existsByNumber(int number);
+    long countByActiveTrue();
 
     // Random active problem — filters applied externally via spec
     @Query(value = "SELECT * FROM problems WHERE active = true ORDER BY RANDOM() LIMIT 1", nativeQuery = true)

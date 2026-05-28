@@ -5,6 +5,7 @@ import dev.codecrafter.problem.entity.Problem;
 import dev.codecrafter.problem.repository.ProblemRepository;
 import dev.codecrafter.stats.entity.UserActivity;
 import dev.codecrafter.stats.repository.UserActivityRepository;
+import dev.codecrafter.studyplan.StudyPlanService;
 import dev.codecrafter.submission.repository.SubmissionRepository;
 import dev.codecrafter.user.entity.UserStats;
 import dev.codecrafter.user.repository.UserRepository;
@@ -28,6 +29,7 @@ public class StatsSyncService {
     private final SubmissionRepository submissionRepository;
     private final ProblemRepository problemRepository;
     private final BadgeEngine badgeEngine;
+    private final StudyPlanService studyPlanService;
 
     /**
      * Called after every AC verdict. Updates denormalised stats, activity, streaks, then runs badge engine.
@@ -60,6 +62,7 @@ public class StatsSyncService {
         upsertActivity(userId);
         recomputeStreaks(userId);
         badgeEngine.evaluate(userId);
+        studyPlanService.onProblemSolved(userId, problemId);
     }
 
     private void upsertActivity(Long userId) {

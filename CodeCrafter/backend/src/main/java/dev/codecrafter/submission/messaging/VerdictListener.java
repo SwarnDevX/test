@@ -1,5 +1,7 @@
 package dev.codecrafter.submission.messaging;
 
+import dev.codecrafter.contest.ContestService;
+import dev.codecrafter.infra.metrics.SubmissionMetrics;
 import dev.codecrafter.stats.StatsSyncService;
 import dev.codecrafter.submission.entity.Submission;
 import dev.codecrafter.submission.entity.SubmissionStatus;
@@ -19,6 +21,8 @@ public class VerdictListener {
     private final SubmissionRepository submissionRepository;
     private final SimpMessagingTemplate ws;
     private final StatsSyncService statsSyncService;
+    private final ContestService contestService;
+    private final SubmissionMetrics submissionMetrics;
 
     @RabbitListener(queues = "${app.rabbitmq.verdict-queue}")
     @Transactional
@@ -44,9 +48,23 @@ public class VerdictListener {
 
             submissionRepository.save(sub);
 
-            if (status == SubmissionStatus.ACCEPTED) {
+            long waitMs = sub.getCreatedAt() != null
+                ? java.time.Instant.now().toEpochMilli() - sub.getCreatedAt().toEpochMilli()
+                : 0;
+            submissionMetrics.recordVerdict(status.name(),
+                sub.getLanguage() != null ? sub.getLanguage() : "unknown", waitMs);
+            if (status == SubmissionStatus.INTERNAL_ERROR) {
+                submissionMetrics.recordRunError();
+            }
+
+            boolean accepted = status == SubmissionStatus.ACCEPTED;
+            if (accepted) {
                 statsSyncService.onAccepted(sub.getUser().getId(), sub.getProblem().getId());
             }
+            contestService.onSubmissionVerdict(
+                sub.getId(), sub.getUser().getId(), sub.getProblem().getId(),
+                accepted, sub.getUpdatedAt() != null ? sub.getUpdatedAt() : java.time.Instant.now()
+            );
         });
 
         ws.convertAndSend("/topic/submissions/" + msg.submissionId(), msg);

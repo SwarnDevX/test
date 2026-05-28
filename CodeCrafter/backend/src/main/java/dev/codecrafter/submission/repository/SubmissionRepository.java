@@ -22,6 +22,9 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
 
     boolean existsByUserIdAndProblemIdAndStatus(Long userId, Long problemId, SubmissionStatus status);
 
+    @Query("SELECT s FROM Submission s WHERE s.problem.id = :problemId ORDER BY s.createdAt DESC")
+    List<Submission> findByProblemId(Long problemId);
+
     /** Returns distinct languages in which the user has at least one AC submission. */
     @Query("SELECT DISTINCT s.language FROM Submission s WHERE s.user.id = :userId AND s.verdict = 'ACCEPTED'")
     List<String> findDistinctAcLanguages(Long userId);

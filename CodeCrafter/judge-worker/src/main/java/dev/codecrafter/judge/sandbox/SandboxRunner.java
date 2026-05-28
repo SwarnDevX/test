@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Component
 @Slf4j
@@ -42,7 +43,7 @@ public class SandboxRunner {
         if (!lang.isCompiled()) return new CompileResult(true, "");
 
         List<String> cmd = buildDockerCmd(lang, workDir,
-            lang.getCompileCommand() + " 2>&1", compileTimeoutSeconds);
+            lang.getCompileCommand() + " 2>&1", compileTimeoutSeconds, null);
 
         long start = System.currentTimeMillis();
         Process proc = new ProcessBuilder(cmd).redirectErrorStream(true).start();
@@ -61,10 +62,16 @@ public class SandboxRunner {
             throws IOException, InterruptedException {
 
         int timeoutSec = Math.max(1, (timeLimitMs / 1000) + 2);
-        List<String> cmd = buildDockerCmd(lang, workDir, lang.getRunCommand(), timeoutSec);
+        // Named container so we can sample docker stats; removed --rm for manual cleanup
+        String containerName = "cc_" + UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+        List<String> cmd = buildDockerCmd(lang, workDir, lang.getRunCommand(), timeoutSec, containerName);
 
         long start = System.currentTimeMillis();
         Process proc = new ProcessBuilder(cmd).start();
+
+        // Sample peak memory in a virtual thread while the container is alive
+        AtomicLong peakMemKb = new AtomicLong(0);
+        Thread sampler = Thread.ofVirtual().start(() -> samplePeakMemory(containerName, peakMemKb));
 
         try (var os = proc.getOutputStream()) {
             os.write(stdin.getBytes(StandardCharsets.UTF_8));
@@ -76,10 +83,13 @@ public class SandboxRunner {
         boolean finished = proc.waitFor(timeoutSec, TimeUnit.SECONDS);
         long runtimeMs = System.currentTimeMillis() - start;
 
+        sampler.interrupt();
+        removeContainer(containerName);
+
         if (!finished) {
             proc.destroyForcibly();
             return new ExecResult("", new String(stderrBytes, StandardCharsets.UTF_8),
-                -1, true, false, runtimeMs);
+                -1, true, false, runtimeMs, peakMemKb.get());
         }
 
         boolean outputLimitExceeded = stdoutBytes.length >= outputSizeLimitBytes;
@@ -89,19 +99,81 @@ public class SandboxRunner {
             proc.exitValue(),
             false,
             outputLimitExceeded,
-            runtimeMs
+            runtimeMs,
+            peakMemKb.get()
         );
     }
 
-    private List<String> buildDockerCmd(Language lang, Path workDir, String shellCmd, int timeoutSec) {
+    /**
+     * Polls `docker stats` every 300ms while the container runs to capture peak memory.
+     * Virtual-thread-safe: exits cleanly on interrupt.
+     */
+    private void samplePeakMemory(String containerName, AtomicLong peakMemKb) {
+        while (!Thread.currentThread().isInterrupted()) {
+            try {
+                Process stats = new ProcessBuilder(
+                    "docker", "stats", "--no-stream", "--format", "{{.MemUsage}}", containerName
+                ).redirectErrorStream(true).start();
+                boolean done = stats.waitFor(2, TimeUnit.SECONDS);
+                if (!done) stats.destroyForcibly();
+
+                String line = new String(stats.getInputStream().readAllBytes(), StandardCharsets.UTF_8).trim();
+                if (!line.isBlank() && line.contains("/")) {
+                    long kb = parseDockerMemKb(line.split("/")[0].trim());
+                    if (kb > 0) peakMemKb.updateAndGet(prev -> Math.max(prev, kb));
+                }
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            } catch (Exception ignored) {}
+        }
+    }
+
+    /** Parses Docker memory strings like "12.5MiB", "128MiB", "1.2GiB", "512KiB" → KB. */
+    private long parseDockerMemKb(String mem) {
+        try {
+            String s = mem.toUpperCase().trim();
+            if (s.endsWith("GIB")) return (long) (Double.parseDouble(s.replace("GIB", "").trim()) * 1_048_576);
+            if (s.endsWith("MIB")) return (long) (Double.parseDouble(s.replace("MIB", "").trim()) * 1_024);
+            if (s.endsWith("KIB")) return (long)  Double.parseDouble(s.replace("KIB", "").trim());
+            if (s.endsWith("GB"))  return (long) (Double.parseDouble(s.replace("GB",  "").trim()) * 1_000_000);
+            if (s.endsWith("MB"))  return (long) (Double.parseDouble(s.replace("MB",  "").trim()) * 1_000);
+            if (s.endsWith("KB"))  return (long)  Double.parseDouble(s.replace("KB",  "").trim());
+            if (s.endsWith("B"))   return Math.max(1L, Long.parseLong(s.replace("B", "").trim()) / 1024);
+        } catch (Exception ignored) {}
+        return 0;
+    }
+
+    private void removeContainer(String containerName) {
+        try {
+            new ProcessBuilder("docker", "rm", "-f", containerName)
+                .redirectErrorStream(true).start().waitFor(5, TimeUnit.SECONDS);
+        } catch (Exception ignored) {}
+    }
+
+    private List<String> buildDockerCmd(Language lang, Path workDir, String shellCmd,
+                                        int timeoutSec, String containerName) {
         String mountPath = workDir.toAbsolutePath().toString().replace('\\', '/');
         if (mountPath.length() > 2 && mountPath.charAt(1) == ':') {
             mountPath = "/" + Character.toLowerCase(mountPath.charAt(0)) + mountPath.substring(2);
         }
 
-        List<String> cmd = new ArrayList<>(List.of(
-            "docker", "run", "--rm",
+        List<String> cmd = new ArrayList<>();
+        cmd.add("docker");
+        cmd.add("run");
+
+        if (containerName != null) {
+            // Named container for stats sampling; caller removes it manually
+            cmd.add("--name");
+            cmd.add(containerName);
+        } else {
+            cmd.add("--rm");
+        }
+
+        cmd.addAll(List.of(
             "--network=none",
+            "--read-only",
+            "--user", "65534:65534",
             "--memory=" + memoryLimitMb + "m",
             "--memory-swap=" + memoryLimitMb + "m",
             "--cpus=" + cpuLimit,
@@ -141,6 +213,7 @@ public class SandboxRunner {
         int exitCode,
         boolean timedOut,
         boolean outputLimitExceeded,
-        long runtimeMs
+        long runtimeMs,
+        long memoryKb
     ) {}
 }

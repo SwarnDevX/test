@@ -4,10 +4,11 @@ import dev.codecrafter.problem.ProblemService;
 import dev.codecrafter.problem.dto.PageResponse;
 import dev.codecrafter.problem.dto.ProblemDetailDto;
 import dev.codecrafter.problem.dto.ProblemListItemDto;
-import dev.codecrafter.problem.entity.Problem;
+import dev.codecrafter.problem.entity.TestCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -49,4 +50,35 @@ public class AdminProblemController {
         adminProblemService.toggleActive(slug, active);
         return Map.of("message", "Problem " + (active ? "activated" : "deactivated"));
     }
+
+    @PostMapping("/{slug}/rejudge")
+    @Operation(summary = "Re-queue all submissions for a problem (e.g. after test cases changed)")
+    public Map<String, Object> rejudge(@PathVariable String slug) {
+        int count = adminProblemService.rejudge(slug);
+        return Map.of("message", "Re-queued " + count + " submissions", "count", count);
+    }
+
+    @PostMapping("/{slug}/test-cases")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Add a test case to a problem")
+    public TestCase addTestCase(
+            @PathVariable String slug,
+            @RequestBody AddTestCaseRequest req) {
+        return adminProblemService.addTestCase(slug, req.input(), req.expectedOutput(), req.sample());
+    }
+
+    @DeleteMapping("/{slug}/test-cases/{testCaseId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Delete a test case")
+    public void deleteTestCase(
+            @PathVariable String slug,
+            @PathVariable Long testCaseId) {
+        adminProblemService.deleteTestCase(testCaseId);
+    }
+
+    public record AddTestCaseRequest(
+        @NotBlank String input,
+        @NotBlank String expectedOutput,
+        boolean sample
+    ) {}
 }

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { Shuffle, CheckCircle2, MinusCircle, Circle, ChevronUp, ChevronDown } from "lucide-react";
 import api from "@/lib/api";
+import { DailyChallengeBanner } from "@/components/challenge/DailyChallengeBanner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -78,11 +79,15 @@ export default function ProblemsPage() {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
       <div className="max-w-5xl mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold">Problems</h1>
           <Button variant="outline" className="border-zinc-700 gap-2" onClick={handleRandom}>
             <Shuffle className="h-4 w-4" /> Pick One
           </Button>
+        </div>
+
+        <div className="mb-6">
+          <DailyChallengeBanner />
         </div>
 
         {/* Filters */}

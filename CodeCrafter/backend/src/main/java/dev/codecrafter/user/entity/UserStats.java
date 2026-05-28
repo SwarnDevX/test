@@ -47,6 +47,12 @@ public class UserStats {
     @Builder.Default
     private int reputation = 0;
 
+    @Builder.Default
+    private int contestRating = 1500;
+
+    @Builder.Default
+    private int contestsParticipated = 0;
+
     private LocalDate lastActiveDate;
 
     @UpdateTimestamp
